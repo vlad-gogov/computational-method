@@ -3,7 +3,7 @@
 
 class Spline {
 	private:
-		std::vector<double> a, b, ñ, d;
+		std::vector<double> a, b, c, d;
         std::vector<double> x;
         size_t countPoint, N;
 

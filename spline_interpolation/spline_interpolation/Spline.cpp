@@ -55,31 +55,31 @@ Spline::Spline(const std::vector<double>& x, const std::vector<double>& y) : x(x
 
     this->a.resize(countPoint);
     this->b.resize(countPoint);
-    this->ñ.resize(countPoint);
+    this->c.resize(countPoint);
     this->d.resize(countPoint);
 
-    ñ[0] = ñ[N] = 0.0f;
-    ñ[N - 1] = q[N - 2];
+    c[0] = c[N] = 0.0f;
+    c[N - 1] = q[N - 2];
 
     for (size_t k = N - 2; k > 0; k--)
     {
-        ñ[k] = p[k - 1] * ñ[k + 1] + q[k - 1];
+        c[k] = p[k - 1] * c[k + 1] + q[k - 1];
     }
 
     for (size_t k = 0; k < N + 1; k++)
     {
         if(k != 0)
-            d[k] = ñ[k] - ñ[k - 1];
+            d[k] = c[k] - c[k - 1];
         else
-            d[k] = ñ[k + 1] / h[k];
+            d[k] = c[k + 1] / h[k];
     }
 
     for (size_t k = 0; k < N + 1; k++)
     {
         if(k != 0)
-            b[k] = ñ[k] * h[k - 1] / 3 + ñ[k - 1] * h[k - 1] / 6 + ((y[k] - y[k - 1]) / h[k - 1]);
+            b[k] = c[k] * h[k - 1] / 3 + c[k - 1] * h[k - 1] / 6 + ((y[k] - y[k - 1]) / h[k - 1]);
         else
-            b[k] = ñ[k + 1] * h[k] / 3 + ((y[k + 1] - y[k]) / h[k]);
+            b[k] = c[k + 1] * h[k] / 3 + ((y[k + 1] - y[k]) / h[k]);
     }
 
     for (size_t k = 0; k < N + 1; k++) {
@@ -92,7 +92,7 @@ double Spline::getSplineValue(size_t index, double x)
     if (index > N + 1)
         throw "Invalid index";
     double epsilon = x - this->x[index];
-    double value = (a[index] + b[index] * epsilon + (ñ[index] / 2) * epsilon * epsilon +
+    double value = (a[index] + b[index] * epsilon + (c[index] / 2) * epsilon * epsilon +
         (d[index] / 6) * epsilon * epsilon * epsilon);
     return value;
 }
