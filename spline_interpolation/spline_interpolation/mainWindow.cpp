@@ -1,88 +1,147 @@
 #include "mainWindow.h"
 #include <algorithm>
-
-#include <QLogValueAxis>
-#include <QLineSeries>
-#include <QValueAxis>
-#include <QChart>
-#include <QChartView>
-
-#include "Spline.h"
+#include <sstream>
+#include <string>
 
 using namespace QtCharts;
 
 mainWindow::mainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::mainWindowClass)
-{
+    : QMainWindow(parent), ui(new Ui::mainWindowClass) {
     ui->setupUi(this);
 
-    size_t countPoint = 5;
-
-    std::vector<double> x(countPoint), y(countPoint);
-
-    for (size_t i = 0; i < countPoint; i++) {
-        x[i] = i;
-    }
-
-    y[0] = 0;
-    y[1] = 1;
-    y[2] = 2;
-    y[3] = 1;
-    y[4] = 0;
-
-    Spline interplotation(x, y);
-
-    QChartView* chartView = new QChartView(this);
+    chartView = new QChartView(this);
+    chart = new QChart();
     ui->verticalLayout->addWidget(chartView);
+    series = new QLineSeries();
+    seriesLineX = new QLineSeries();
+    seriesLineY = new QLineSeries();
+    pointSeries = new QScatterSeries();
+    pen = new QPen();
+    pen->setColor(QColorConstants::Black);
 
-    QLineSeries* series = new QLineSeries();
-    double Xmax = x[countPoint - 1] + 1, Xmin = x[0] - 1,
-        Ymax = *std::max_element(y.data(), y.data() + countPoint) + 1, Ymin = *std::min_element(y.data(), y.data() + countPoint) - 1;
+    axisX = new QValueAxis();
+    axisY = new QValueAxis();
 
-    for (double i = Xmin; i < x[0]; i += 0.01)
-    {
-        series->append(i, interplotation.getSplineValue(0, i));
-    }
+    chart->setTitle("Spline Interpolation");
+
+    connect(ui->addPoints, SIGNAL(clicked()), this, SLOT(addPointDialog()));
+}
+
+mainWindow::~mainWindow() {
+    delete ui;
+    delete series;
+    delete seriesLineX;
+    delete seriesLineY;
+    delete pointSeries;
+    delete chart;
+    delete axisX;
+    delete axisY;
+}
+
+void mainWindow::setGraphic() {
+    series->clear();
+    seriesLineX->clear();
+    seriesLineY->clear();
+    pointSeries->clear();
+
+    chart->legend()->hide();
+
+    seriesLineX->setPen(*pen);
+    seriesLineY->setPen(*pen);
+    pointSeries->setColor(QColorConstants::Red);
+    double Xmax = interplotation.x[interplotation.countPoint - 1] + 1, Xmin = interplotation.x[0] - 1,
+        Ymax = *std::max_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint) + 1, Ymin = *std::min_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint) - 1;
+
+
+    pointSeries->append(interplotation.x[0], interplotation.y[0]);
 
     for (size_t k = 1; k < interplotation.getCountPoint(); k++) {
-        for (double i = x[k - 1]; i < x[k]; i += 0.01)
+        pointSeries->append(interplotation.x[k], interplotation.y[k]);
+        for (double i = Xmin; i < interplotation.x[k]; i += 0.001)
         {
             series->append(i, interplotation.getSplineValue(k, i));
         }
     }
 
-    for (double i = x[countPoint - 1]; i < Xmax; i += 0.01)
+    for (double i = interplotation.x[interplotation.countPoint - 1]; i < Xmax; i += 0.001)
     {
-        series->append(i, interplotation.getSplineValue(countPoint - 1, i));
+        series->append(i, interplotation.getSplineValue(interplotation.countPoint - 1, i));
     }
 
-    QChart* chart = new QChart();
-    chart->legend()->hide();
-    chart->setTitle("Graphic");
-    chart->addSeries(series);
+    for (double i = Xmin; i < Xmax; i += 0.001) {
+        seriesLineX->append(i, 0);
+    }
 
-    QValueAxis* axisX = new QValueAxis();
+    for (double i = Ymin; i < Ymax; i += 0.001) {
+        seriesLineY->append(0, i);
+    }
+
     axisX->setTitleText("X");
     axisX->setLabelFormat("%.2lf");
     axisX->setMin(Xmin);
     axisX->setMax(Xmax);
-    axisX->setTickCount(countPoint);
+    axisX->setTickCount(interplotation.countPoint + 5);
     chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
 
-    QValueAxis* axisY = new QValueAxis();
     axisY->setTitleText("Y");
     axisY->setLabelFormat("%.2lf");
     axisY->setMin(Ymin);
     axisY->setMax(Ymax);
-    axisY->setTickCount(countPoint);
+    axisY->setTickCount(interplotation.countPoint + 5);
     chart->addAxis(axisY, Qt::AlignLeft);
+
+    chart->addSeries(series);
+    chart->addSeries(pointSeries);
+    chart->addSeries(seriesLineX);
+    chart->addSeries(seriesLineY);
+
+    series->attachAxis(axisX);
+    pointSeries->attachAxis(axisX);
+    seriesLineX->attachAxis(axisX);
+    seriesLineY->attachAxis(axisX);
+
     series->attachAxis(axisY);
+    pointSeries->attachAxis(axisY);
+    seriesLineX->attachAxis(axisY);
+    seriesLineY->attachAxis(axisY);
 
     chartView->setChart(chart);
 }
 
-mainWindow::~mainWindow()
-{
-    delete ui;
+void mainWindow::addPointDialog() {
+    interplotation.deleteSpline();
+    bool ok;
+    size_t countPoint = QInputDialog::getInt(this, tr("Set Points"),
+        tr("Count points:"), 0, 4, 30, 1, &ok);
+    interplotation = Spline(countPoint - 1, countPoint);
+    size_t i = 0;
+    while(i != countPoint) {
+        addPoint dialog;
+        std::ostringstream ostr;
+        ostr << (i + 1);
+        QString title = QString::fromStdString(ostr.str());
+        dialog.setWindowTitle("Add Point #" + title);
+        dialog.exec();
+        if (dialog.result() == QDialog::Accepted) {
+            QPointF temp = dialog.pointF();
+            try {
+                interplotation.addPoint(temp);
+                i++;
+            }
+            catch (const char* message) {
+                QMessageBox::warning(this, "Error", message);
+            }
+        }
+        else if (dialog.result() == QDialog::Rejected) {
+            interplotation.deleteSpline();
+            return;
+        }
+    }
+    try {
+        interplotation.solve();
+        setGraphic();
+    }
+    catch (const char* message) {
+        QMessageBox::warning(this, "Error", message);
+    }
 }

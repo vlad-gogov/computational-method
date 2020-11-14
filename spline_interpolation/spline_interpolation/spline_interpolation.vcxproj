@@ -86,14 +86,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="addPoint.cpp" />
     <ClCompile Include="Spline.cpp" />
     <QtRcc Include="mainWindow.qrc" />
+    <QtUic Include="addPoint.ui" />
     <QtUic Include="mainWindow.ui" />
     <QtMoc Include="mainWindow.h" />
     <ClCompile Include="mainWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="addPoint.h" />
     <ClInclude Include="Spline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

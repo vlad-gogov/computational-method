@@ -1,10 +1,40 @@
 #include "Spline.h"
 
-Spline::Spline(const std::vector<double>& x, const std::vector<double>& y) : x(x) {
-    if (x.size() != y.size())
-        throw "Invalid data";
-    countPoint = x.size();
-    N = countPoint - 1;
+#define MIN_POINT_SPLINE 3
+
+Spline::Spline() {
+    N = countPoint = 0;
+}
+
+Spline::Spline(const size_t N_, const size_t countPoint_) {
+    N = N_;
+    countPoint = countPoint_;
+    a = std::vector<double>(countPoint, 0);
+    b = std::vector<double>(countPoint, 0);
+    c = std::vector<double>(countPoint, 0);
+    d = std::vector<double>(countPoint, 0);
+}
+
+void Spline::addPoint(const QPointF& temp) {
+    size_t index;
+    for (index = 0; index < x.size(); index++) {
+        if(x[index] == temp.x())
+            throw "A point with this x coordinate already exists";
+        if (x[index] > temp.x()) {
+            break;
+        }
+    }
+    if (index == countPoint)
+        throw "Spline is full";
+    x.insert(x.begin() + index, temp.x());
+    y.insert(y.begin() + index, temp.y());
+}
+
+void Spline::solve() {
+
+    if (x.size() < MIN_POINT_SPLINE) {
+        return;
+    }
 
     std::vector<double> h(N);
     for (size_t k = 0; k < N; k++) {
@@ -32,59 +62,51 @@ Spline::Spline(const std::vector<double>& x, const std::vector<double>& y) : x(x
 
     std::vector<double> p(N - 2), q(N - 1);
 
-    for (size_t k = 0; k < N - 2; k++)
-    {
-        if (k != 0) {
-            double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
-            p[k] = -aboveDiagonal[k] / temp;
-        }
-        else {
-            p[k] = -aboveDiagonal[k] / mainDiagonal[k];
-        }
+    p[0] = -aboveDiagonal[0] / mainDiagonal[0];
+
+    for (size_t k = 1; k < N - 2; k++) {
+        double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
+        p[k] = -aboveDiagonal[k] / temp;
     }
 
-    for (size_t k = 0; k < N - 1; k++)
-    {
-        if (k != 0) {
-            double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
-            q[k] = (f[k] - belowDiagonal[k - 1] * q[k - 1]) / temp;
-        }
-        else
-            q[k] = f[k] / mainDiagonal[k];
-    }
+    q[0] = f[0] / mainDiagonal[0];
 
-    this->a.resize(countPoint);
-    this->b.resize(countPoint);
-    this->c.resize(countPoint);
-    this->d.resize(countPoint);
+    for (size_t k = 1; k < N - 1; k++) {
+        double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
+        q[k] = (f[k] - belowDiagonal[k - 1] * q[k - 1]) / temp;
+    }
 
     c[0] = c[N] = 0.0f;
     c[N - 1] = q[N - 2];
 
-    for (size_t k = N - 2; k > 0; k--)
-    {
+    for (size_t k = N - 2; k > 0; k--) {
         c[k] = p[k - 1] * c[k + 1] + q[k - 1];
     }
 
-    for (size_t k = 0; k < N + 1; k++)
-    {
-        if(k != 0)
+    d[0] = c[1] / h[0];
+
+    for (size_t k = 1; k < N + 1; k++) {
             d[k] = c[k] - c[k - 1];
-        else
-            d[k] = c[k + 1] / h[k];
     }
 
-    for (size_t k = 0; k < N + 1; k++)
-    {
-        if(k != 0)
-            b[k] = c[k] * h[k - 1] / 3 + c[k - 1] * h[k - 1] / 6 + ((y[k] - y[k - 1]) / h[k - 1]);
-        else
-            b[k] = c[k + 1] * h[k] / 3 + ((y[k + 1] - y[k]) / h[k]);
+    b[0] = c[1] * h[0] / 3 + ((y[1] - y[0]) / h[0]);
+
+    for (size_t k = 1; k < N + 1; k++) {
+        b[k] = c[k] * h[k - 1] / 3 + c[k - 1] * h[k - 1] / 6 + ((y[k] - y[k - 1]) / h[k - 1]);
     }
 
     for (size_t k = 0; k < N + 1; k++) {
         a[k] = y[k];
     }
+}
+
+void Spline::deleteSpline() {
+    x.clear();
+    y.clear();
+    a.clear();
+    b.clear();
+    c.clear();
+    d.clear();
 }
 
 double Spline::getSplineValue(size_t index, double x)

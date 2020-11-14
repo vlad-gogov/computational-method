@@ -25,7 +25,7 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="addPoints">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -44,22 +44,5 @@
  <resources>
   <include location="mainWindow.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>mainWindowClass</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>110</x>
-     <y>45</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>528</x>
-     <y>332</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
