@@ -86,7 +86,7 @@ void Spline::solve() {
     d[0] = c[1] / h[0];
 
     for (size_t k = 1; k < N + 1; k++) {
-            d[k] = c[k] - c[k - 1];
+            d[k] = (c[k] - c[k - 1]) / h[k - 1];
     }
 
     b[0] = c[1] * h[0] / 3 + ((y[1] - y[0]) / h[0]);
@@ -101,6 +101,8 @@ void Spline::solve() {
 }
 
 void Spline::deleteSpline() {
+    N = 0;
+    countPoint = 0;
     x.clear();
     y.clear();
     a.clear();
