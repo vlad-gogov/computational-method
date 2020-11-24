@@ -14,15 +14,14 @@ mainWindow::mainWindow(QWidget* parent)
     chartView = new QChartView(this);
     chart = new QChart();
     ui->verticalLayout->addWidget(chartView);
+    axisX = new QValueAxis();
+    axisY = new QValueAxis();
     series = new QLineSeries();
     seriesLineX = new QLineSeries();
     seriesLineY = new QLineSeries();
     pointSeries = new QScatterSeries();
     pen = new QPen();
     pen->setColor(QColorConstants::Black);
-
-    axisX = new QValueAxis();
-    axisY = new QValueAxis();
 
     chart->setTitle("Spline Interpolation");
 
@@ -36,11 +35,9 @@ mainWindow::~mainWindow() {
     delete seriesLineY;
     delete pointSeries;
     delete chart;
-    delete axisX;
-    delete axisY;
 }
 
-void mainWindow::setGraphic() {
+void mainWindow::setGraphics() {
     series->clear();
     seriesLineX->clear();
     seriesLineY->clear();
@@ -117,10 +114,9 @@ void mainWindow::setGraphic() {
 }
 
 void mainWindow::addPointDialog() {
-    interplotation.deleteSpline();
     bool ok;
     size_t countPoint = QInputDialog::getInt(this, tr("Set Points"),
-        tr("Count points:"), 0, 4, 30, 1, &ok);
+        tr("Count points:"), 0, 4, 16, 1, &ok);
     interplotation = Spline(countPoint - 1, countPoint);
     size_t i = 0;
     while(i != countPoint) {
@@ -141,13 +137,13 @@ void mainWindow::addPointDialog() {
             }
         }
         else if (dialog.result() == QDialog::Rejected) {
-            interplotation.deleteSpline();
             return;
         }
     }
     try {
         interplotation.solve();
-        setGraphic();
+        setGraphics();
+        ui->addPoints->setVisible(false);
     }
     catch (const char* message) {
         QMessageBox::warning(this, "Error", message);

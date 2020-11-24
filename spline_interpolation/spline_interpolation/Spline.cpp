@@ -100,17 +100,6 @@ void Spline::solve() {
     }
 }
 
-void Spline::deleteSpline() {
-    N = 0;
-    countPoint = 0;
-    x.clear();
-    y.clear();
-    a.clear();
-    b.clear();
-    c.clear();
-    d.clear();
-}
-
 double Spline::getSplineValue(size_t index, double x)
 {
     if (index > N + 1)

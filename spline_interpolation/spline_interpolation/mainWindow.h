@@ -44,7 +44,7 @@ public:
     mainWindow(QWidget *parent = Q_NULLPTR);
     ~mainWindow();
 
-    void setGraphic();
+    void setGraphics();
 
 private:
     Ui::mainWindowClass *ui;

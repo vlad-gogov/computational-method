@@ -14,10 +14,9 @@ class Spline {
         Spline(const size_t N_, const size_t countPoint_);
         void addPoint(const QPointF& temp);
         void solve();
-        double Spline::getSplineValue(const size_t index, const double x);
+        double getSplineValue(const size_t index, const double x);
         size_t getN();
         size_t getCountPoint();
-        void deleteSpline();
 
         friend class mainWindow;
 };
