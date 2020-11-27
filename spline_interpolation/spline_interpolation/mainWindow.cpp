@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 #define STEP_SLPINE 100
-#define ADD_MAX 10
+#define ADD_MAX 1.25
 
 using namespace QtCharts;
 
@@ -49,11 +49,12 @@ void mainWindow::setGraphics() {
     seriesLineY->setPen(*pen);
     pointSeries->setColor(QColorConstants::Red);
     pointSeries->setMarkerSize(10);
-    double Xmax = interplotation.x[interplotation.countPoint - 1] + ADD_MAX, Xmin = interplotation.x[0] - ADD_MAX,
-        Ymax = *std::max_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint) + ADD_MAX, Ymin = *std::min_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint) - ADD_MAX;
+    double Xmax = interplotation.x[interplotation.countPoint - 1], Xmin = interplotation.x[0],
+        Ymax = *std::max_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint), Ymin = *std::min_element(interplotation.y.data(), interplotation.y.data() + interplotation.countPoint);
+    double min_x = Xmin - ((Xmax - Xmin) * ADD_MAX), max_x = Xmax + ((Xmax - Xmin) * ADD_MAX);
+    double min_y = Ymin - ((Ymax - Ymin) * ADD_MAX), max_y = Ymax + ((Ymax - Ymin) * ADD_MAX);
 
-
-    for (double i = Xmin; i < interplotation.x[0]; i += 1. / STEP_SLPINE)
+    for (double i = min_x; i < interplotation.x[0]; i += 1. / STEP_SLPINE)
     {
         series->append(i, interplotation.getSplineValue(1, i));
     }
@@ -68,31 +69,31 @@ void mainWindow::setGraphics() {
         }
     }
 
-    for (double i = interplotation.x[interplotation.countPoint - 1]; i < Xmax; i += 1. / STEP_SLPINE)
+    for (double i = interplotation.x[interplotation.countPoint - 1]; i < max_x; i += 1. / STEP_SLPINE)
     {
         series->append(i, interplotation.getSplineValue(interplotation.countPoint - 1, i));
     }
 
-    for (double i = Xmin; i < Xmax; i += 1. / STEP_SLPINE) {
+    for (double i = min_x; i < max_x; i += 1. / STEP_SLPINE) {
         seriesLineX->append(i, 0);
     }
 
-    for (double i = Ymin; i < Ymax; i += 1. / STEP_SLPINE) {
+    for (double i = min_y; i < max_y; i += 1. / STEP_SLPINE) {
         seriesLineY->append(0, i);
     }
 
     axisX->setTitleText("X");
     axisX->setLabelFormat("%.2lf");
-    axisX->setMin(Xmin);
-    axisX->setMax(Xmax);
-    axisX->setTickCount(interplotation.countPoint + ADD_MAX);
+    axisX->setMin(min_x);
+    axisX->setMax(max_x);
+    axisX->setTickCount(interplotation.countPoint + ADD_MAX * 10);
     chart->addAxis(axisX, Qt::AlignBottom);
 
     axisY->setTitleText("Y");
     axisY->setLabelFormat("%.2lf");
-    axisY->setMin(Ymin);
-    axisY->setMax(Ymax);
-    axisY->setTickCount(interplotation.countPoint + ADD_MAX);
+    axisY->setMin(min_y);
+    axisY->setMax(max_y);
+    axisY->setTickCount(interplotation.countPoint + ADD_MAX * 10);
     chart->addAxis(axisY, Qt::AlignLeft);
 
     chart->addSeries(series);
