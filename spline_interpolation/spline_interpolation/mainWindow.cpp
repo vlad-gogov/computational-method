@@ -116,7 +116,7 @@ void mainWindow::setGraphics() {
 void mainWindow::addPointDialog() {
     bool ok;
     size_t countPoint = QInputDialog::getInt(this, tr("Set Points"),
-        tr("Count points:"), 0, 4, 16, 1, &ok);
+        tr("Count points:"), 0, 2, 16, 1, &ok);
     interplotation = Spline(countPoint - 1, countPoint);
     size_t i = 0;
     while(i != countPoint) {

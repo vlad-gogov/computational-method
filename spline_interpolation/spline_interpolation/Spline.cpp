@@ -1,6 +1,6 @@
 #include "Spline.h"
 
-#define MIN_POINT_SPLINE 3
+#define MIN_POINT_SPLINE 2
 
 Spline::Spline() {
     N = countPoint = 0;
@@ -43,10 +43,8 @@ void Spline::solve() {
             throw "Invalid data";
     }
 
-    std::vector<double> mainDiagonal(N - 1); // Главная диагональ матрицы
-    std::vector<double> aboveDiagonal(N - 2); // Диагональ, лежащая над главной
-    std::vector<double> belowDiagonal(N - 2); // Диагональ, лежащая под главной
     std::vector<double> f(N - 1);
+    std::vector<double> mainDiagonal(N - 1); // Главная диагональ матрицы
 
     for (size_t k = 0; k < N - 1; k++)
     {
@@ -54,39 +52,51 @@ void Spline::solve() {
         mainDiagonal[k] = 2;
     }
 
-    for (size_t k = 0; k < N - 2; k++)
-    {
-        aboveDiagonal[k] = h[k + 2] / (h[k + 1] + h[k + 2]);
-        belowDiagonal[k] = h[k + 1] / (h[k + 1] + h[k + 2]);
+    if (N > 2) {
+        std::vector<double> aboveDiagonal(N - 2); // Диагональ, лежащая над главной
+        std::vector<double> belowDiagonal(N - 2); // Диагональ, лежащая под главной
+
+        for (size_t k = 0; k < N - 2; k++)
+        {
+            aboveDiagonal[k] = h[k + 2] / (h[k + 1] + h[k + 2]);
+            belowDiagonal[k] = h[k + 1] / (h[k + 1] + h[k + 2]);
+        }
+
+        std::vector<double> p(N - 2), q(N - 1);
+
+        p[0] = -aboveDiagonal[0] / mainDiagonal[0];
+
+        for (size_t k = 1; k < N - 2; k++) {
+            double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
+            p[k] = -aboveDiagonal[k] / temp;
+        }
+
+        q[0] = f[0] / mainDiagonal[0];
+
+        for (size_t k = 1; k < N - 1; k++) {
+            double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
+            q[k] = (f[k] - belowDiagonal[k - 1] * q[k - 1]) / temp;
+        }
+
+        c[0] = c[N] = 0.0f;
+        c[N - 1] = q[N - 2];
+
+        for (size_t k = N - 2; k > 0; k--) {
+            c[k] = p[k - 1] * c[k + 1] + q[k - 1];
+        }
     }
-
-    std::vector<double> p(N - 2), q(N - 1);
-
-    p[0] = -aboveDiagonal[0] / mainDiagonal[0];
-
-    for (size_t k = 1; k < N - 2; k++) {
-        double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
-        p[k] = -aboveDiagonal[k] / temp;
-    }
-
-    q[0] = f[0] / mainDiagonal[0];
-
-    for (size_t k = 1; k < N - 1; k++) {
-        double temp = belowDiagonal[k - 1] * p[k - 1] + mainDiagonal[k];
-        q[k] = (f[k] - belowDiagonal[k - 1] * q[k - 1]) / temp;
+    else if (N == 2) {
+        f[0] = 6 * (h[0] * (y[2] - y[1]) - h[1] * (y[1] - y[0])) / (h[1] * h[0] * (h[1] + h[0]));
+        mainDiagonal[0] = 2;
+        c[1] = f[0] / mainDiagonal[0];
     }
 
     c[0] = c[N] = 0.0f;
-    c[N - 1] = q[N - 2];
-
-    for (size_t k = N - 2; k > 0; k--) {
-        c[k] = p[k - 1] * c[k + 1] + q[k - 1];
-    }
 
     d[0] = c[1] / h[0];
 
     for (size_t k = 1; k < N + 1; k++) {
-            d[k] = (c[k] - c[k - 1]) / h[k - 1];
+        d[k] = (c[k] - c[k - 1]) / h[k - 1];
     }
 
     b[0] = c[1] * h[0] / 3 + ((y[1] - y[0]) / h[0]);
