@@ -86,8 +86,6 @@ void Spline::solve() {
         }
     }
     else if (N == 2) {
-        f[0] = 6 * (h[0] * (y[2] - y[1]) - h[1] * (y[1] - y[0])) / (h[1] * h[0] * (h[1] + h[0]));
-        mainDiagonal[0] = 2;
         c[1] = f[0] / mainDiagonal[0];
     }
 
