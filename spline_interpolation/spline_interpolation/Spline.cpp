@@ -1,4 +1,4 @@
-#include "Spline.h"
+п»ї#include "Spline.h"
 
 #define MIN_POINT_SPLINE 2
 
@@ -44,7 +44,7 @@ void Spline::solve() {
     }
 
     std::vector<double> f(N - 1);
-    std::vector<double> mainDiagonal(N - 1); // Главная диагональ матрицы
+    std::vector<double> mainDiagonal(N - 1); // Р“Р»Р°РІРЅР°СЏ РґРёР°РіРѕРЅР°Р»СЊ РјР°С‚СЂРёС†С‹
 
     for (size_t k = 0; k < N - 1; k++)
     {
@@ -53,8 +53,8 @@ void Spline::solve() {
     }
 
     if (N > 2) {
-        std::vector<double> aboveDiagonal(N - 2); // Диагональ, лежащая над главной
-        std::vector<double> belowDiagonal(N - 2); // Диагональ, лежащая под главной
+        std::vector<double> aboveDiagonal(N - 2); // Р”РёР°РіРѕРЅР°Р»СЊ, Р»РµР¶Р°С‰Р°СЏ РЅР°Рґ РіР»Р°РІРЅРѕР№
+        std::vector<double> belowDiagonal(N - 2); // Р”РёР°РіРѕРЅР°Р»СЊ, Р»РµР¶Р°С‰Р°СЏ РїРѕРґ РіР»Р°РІРЅРѕР№
 
         for (size_t k = 0; k < N - 2; k++)
         {
