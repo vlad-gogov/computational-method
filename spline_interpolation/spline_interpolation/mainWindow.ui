@@ -6,21 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1057</width>
-    <height>665</height>
+    <width>1108</width>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>mainWindow</string>
+   <string>Spline interpolation</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>80</y>
-      <width>981</width>
-      <height>561</height>
+      <width>1071</width>
+      <height>601</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
@@ -35,7 +35,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Set Point</string>
+     <string>Set Points</string>
     </property>
    </widget>
   </widget>
