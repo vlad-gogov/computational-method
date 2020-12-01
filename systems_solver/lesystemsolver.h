@@ -14,17 +14,15 @@ public:
                          const Column& x = Column(),
                          double epsilon = 0) = 0;
     virtual bool needApproximation() = 0;
-
+    bool converge(const Column& xk, const Column& xkp, double eps);
+    bool diagonal(const Matrix& a);
     static int countNonzeroRows(const Matrix& A);
+    static bool hasZerosDiagonal(const Matrix& A);
     static Matrix doGaussElimination(Matrix A);
     static int rank(const Matrix& A);
     static double determinant(const Matrix& A);
-    static Column subtr(const Column& v1, const Column& v2);
-    static Column mul_Z(Matrix A, Column v);
     static Column mul_R(Matrix A, Column v, const double& coeff);
-    static Column sum(Column v1, Column v2);
     static double secondVectorNorm(const Column& v);
-    static bool converge(const Matrix& A);
 };
 
 #endif // LESYSTEMSOLVER_H

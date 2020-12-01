@@ -1,6 +1,40 @@
 #include "lesystemsolver.h"
 #include <iostream>
 
+bool LESystemSolver::converge(const Column& xk, const Column& xkp, double eps)
+{
+    double norm = 0;
+    size_t size = xk.size();
+    for (size_t i = 0; i < size; i++)
+        norm += (xk[i] - xkp[i]) * (xk[i] - xkp[i]);
+    return (sqrt(norm) < eps);
+}
+
+bool LESystemSolver::diagonal(const Matrix& a)
+{
+    size_t size = a.size();
+    double sum = 0;
+    for (size_t i = 0; i < size; i++) {
+        sum = 0;
+        for (size_t j = 0; j < size; j++)
+            sum += abs(a[i][j]);
+        sum -= abs(a[i][i]);
+        if (sum > a[i][i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LESystemSolver::hasZerosDiagonal(const Matrix& A) {
+    size_t size = A.size();
+    for(size_t i = 0; i < size; i++) {
+        if(A[i][i] == 0)
+            return true;
+    }
+    return false;
+}
+
 int LESystemSolver::countNonzeroRows(const Matrix &A)
 {
     int k = 0;
@@ -61,33 +95,6 @@ double LESystemSolver::determinant(const Matrix& A) {
     return det;
 }
 
-Column LESystemSolver::subtr(const Column& v1, const Column& v2) {
-  Column result(v1.size(), 0);
-  if (v1.size() != v2.size()) {
-    std::cerr << "message\n";
-  }
-  else {
-    size_t size = v1.size();
-    for (size_t i = 0; i < size; i++) {
-      result[i] = v1[i] - v2[i];
-    }
-  }
-  return result;
-}
-
-Column LESystemSolver::mul_Z(Matrix A, Column v) {
-  size_t size = v.size();
-  Column res(size);
-  for (size_t i = 0; i < size; i++) {
-    double sum = 0;
-    for (size_t j = 0; j < size; j++) {
-      sum += A[i][j] * v[j];
-    }
-    res[i] = sum;
-  }
-  return res;
-}
-
 Column LESystemSolver::mul_R(Matrix A, Column v, const double& coeff) {
   size_t size = v.size();
   Column res(size);
@@ -101,33 +108,10 @@ Column LESystemSolver::mul_R(Matrix A, Column v, const double& coeff) {
   return res;
 }
 
-Column LESystemSolver::sum(Column v1, Column v2) {
-  size_t size = v1.size();
-  Column res(size);
-  if (v1.size() != v2.size()) {
-    std::cerr << "message\n";
-  }
-  for (size_t i = 0; i < size; i++) {
-    res[i] = v1[i] + v2[i];
-  }
-  return res;
-}
-
 double LESystemSolver::secondVectorNorm(const Column& v) {
   double tmpSum = 0;
   for (double val : v) {
     tmpSum += pow(val, 2);
   }
   return sqrt(tmpSum);
-}
-
-bool LESystemSolver::converge(const Matrix& A) {
-    double sum = 0;
-    for (std::vector<double> v : A) {
-        for (double val : v) {
-        sum += pow(val, 2);
-        }
-    }
-    double eNorm = sqrt(sum);
-  return (eNorm < 1);
 }

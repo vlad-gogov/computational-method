@@ -152,17 +152,23 @@ void MainWindow::solveWithAllMethods()
     int fastest_method = GaussMethod;
     for (int method = 0; method < METHODS_COUNT; method++)
     {
-        Clock::time_point t1 = Clock::now();
-        Column result = m_solvers[method]->solve(A, b, x, EPSILON);
-        Clock::time_point t2 = Clock::now();
-        std::chrono::duration<double> duration = t2 - t1;
-        double duration_s = duration.count();
-        if (duration_s < fastest)
-        {
-            fastest = duration_s;
-            fastest_method = method;
-        }
-        solutions.push_back({ method, result, duration_s });
+        try {
+            Clock::time_point t1 = Clock::now();
+            Column result = m_solvers[method]->solve(A, b, x, EPSILON);
+            Clock::time_point t2 = Clock::now();
+            std::chrono::duration<double> duration = t2 - t1;
+            double duration_s = duration.count();
+            if (duration_s < fastest)
+            {
+                fastest = duration_s;
+                fastest_method = method;
+            }
+            solutions.push_back({ method, result, duration_s });
+        } catch (std::runtime_error& error) {
+            QMessageBox::information(this,
+                                     "Warning",
+                                     methodName(method) + " cannot be executed. " + error.what());
+          }
     }
     if (m_solution != nullptr)
         delete m_solution;
@@ -211,7 +217,7 @@ QString MainWindow::methodName(int method)
     if (method == SimpleIterationMethod)
         return "Simple";
     if (method == UpperRelaxationMethod)
-        return "Upper";
+        return "Upper Relaxation";
     if (method == JacobiMethod)
         return "Jacobi";
     return "Unknown method";
