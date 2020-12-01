@@ -1,6 +1,7 @@
 #include "seidelmethodsolver.h"
+#include <iostream>
 
-Column SeidelMethodSolver::solve(const Matrix& A, const Column& b, const Column& x)
+Column SeidelMethodSolver::solve(const Matrix& A, const Column& b, const Column& x, double epsilon)
 {
     Matrix alpha;
     Column beta, result = x;
@@ -22,12 +23,19 @@ Column SeidelMethodSolver::solve(const Matrix& A, const Column& b, const Column&
       if (converge(alpha)) {
         int iterCounter = 0;
         double currentEps = secondVectorNorm(subtr(b, mul_Z(A, result)));
-        while (currentEps > LE_EPSILON) {
+        while (currentEps > epsilon) {
           result = sum(beta, mul_Z(alpha, result));
           iterCounter++;
           currentEps = secondVectorNorm(subtr(b, mul_Z(A, result)));
         }
       }
-      else; // TODO
+      else {
+            std::cerr << "message\n";
+      }
       return result;
+}
+
+bool SeidelMethodSolver::needApproximation()
+{
+    return true;
 }

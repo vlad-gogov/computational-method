@@ -6,7 +6,14 @@
 class KramerMethodSolver : public LESystemSolver
 {
 public:
-    Column solve(const Matrix& A, const Column& b, const Column&) override;
+    KramerMethodSolver() = default;
+    ~KramerMethodSolver() = default;
+
+    Column solve(const Matrix& A,
+                 const Column& b,
+                 const Column& = Column(),
+                 double = 0) override;
+    bool needApproximation() override;
 };
 
 #endif // KRAMERMETHODSOLVER_H

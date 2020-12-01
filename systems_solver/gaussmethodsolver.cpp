@@ -1,6 +1,6 @@
 #include "gaussmethodsolver.h"
 
-Column GaussMethodSolver::solve(const Matrix& A, const Column& b, const Column&)
+Column GaussMethodSolver::solve(const Matrix& A, const Column& b, const Column&, double)
 {
     Matrix A_ = A;
     Column B_ = b;
@@ -32,4 +32,9 @@ Column GaussMethodSolver::solve(const Matrix& A, const Column& b, const Column&)
         result[i] = (B_[i] - sum) / A_[i][i];
     }
     return result;
+}
+
+bool GaussMethodSolver::needApproximation()
+{
+    return false;
 }

@@ -2,15 +2,20 @@
 #define UPPERRELAXATIONMETHODSOLVER_H
 
 #include <random>
-#include <ctime>
+
 #include "lesystemsolver.h"
 
 class UpperRelaxationMethodSolver : public LESystemSolver
 {
 public:
-    Column solve(const Matrix& A, const Column& b, const Column& x = Column()) override;
-};
+    UpperRelaxationMethodSolver() = default;
+    ~UpperRelaxationMethodSolver() = default;
 
-const Column operator*(const double& left, const Column& right);
+    Column solve(const Matrix& A,
+                 const Column& b,
+                 const Column& x = Column(),
+                 double epsilon = 0) override;
+    bool needApproximation() override;
+};
 
 #endif // UPPERRELAXATIONMETHODSOLVER_H

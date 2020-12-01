@@ -1,12 +1,19 @@
-#ifndef GAUSSMETHOD_H
-#define GAUSSMETHOD_H
+#ifndef GAUSSMETHODSOLVER_H
+#define GAUSSMETHODSOLVER_H
 
 #include "lesystemsolver.h"
 
 class GaussMethodSolver : public LESystemSolver
 {
 public:
-    Column solve(const Matrix& A, const Column& b, const Column&) override;
+    GaussMethodSolver() = default;
+    ~GaussMethodSolver() = default;
+
+    Column solve(const Matrix& A,
+                 const Column& b,
+                 const Column& = Column(),
+                 double = 0) override;
+    bool needApproximation() override;
 };
 
-#endif // GAUSSMETHOD_H
+#endif // GAUSSMETHODSOLVER_H

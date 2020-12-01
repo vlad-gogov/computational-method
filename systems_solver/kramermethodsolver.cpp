@@ -1,6 +1,6 @@
 #include "kramermethodsolver.h"
 
-Column KramerMethodSolver::solve(const Matrix &A, const Column &b, const Column&)
+Column KramerMethodSolver::solve(const Matrix& A, const Column& b, const Column&, double)
 {
     size_t size = A.size();
     Column dets, result;
@@ -24,4 +24,9 @@ Column KramerMethodSolver::solve(const Matrix &A, const Column &b, const Column&
             // TODO
       }
     return result;
+}
+
+bool KramerMethodSolver::needApproximation()
+{
+    return false;
 }

@@ -3,13 +3,21 @@
 
 #include "matrix.h"
 
-constexpr double LE_EPSILON = 1e-4;
-
 class LESystemSolver
 {
 public:
-    virtual Column solve(const Matrix& A, const Column& b, const Column& x = Column()) = 0;
+    LESystemSolver() = default;
+    virtual ~LESystemSolver() = default;
 
+    virtual Column solve(const Matrix& A,
+                         const Column& b,
+                         const Column& x = Column(),
+                         double epsilon = 0) = 0;
+    virtual bool needApproximation() = 0;
+
+    static int countNonzeroRows(const Matrix& A);
+    static Matrix doGaussElimination(Matrix A);
+    static int rank(const Matrix& A);
     static double determinant(const Matrix& A);
     static Column subtr(const Column& v1, const Column& v2);
     static Column mul_Z(Matrix A, Column v);

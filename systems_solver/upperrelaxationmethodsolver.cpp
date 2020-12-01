@@ -1,6 +1,7 @@
 #include "upperrelaxationmethodsolver.h"
+#include <iostream>
 
-Column UpperRelaxationMethodSolver::solve(const Matrix& A, const Column& b, const Column& x)
+Column UpperRelaxationMethodSolver::solve(const Matrix& A, const Column& b, const Column& x, double epsilon)
 {
     double coeff;
 
@@ -30,21 +31,18 @@ Column UpperRelaxationMethodSolver::solve(const Matrix& A, const Column& b, cons
     if (converge(alpha)) {
         int iterCounter = 0;
         double currentEps = secondVectorNorm(subtr(b, mul_Z(A, result)));
-        while (currentEps > LE_EPSILON) {
+        while (currentEps > epsilon) {
           result = sum((1 - coeff) * result, sum(beta, mul_R(alpha, result, coeff)));
           iterCounter++;
           currentEps = secondVectorNorm(subtr(b, mul_Z(A, result)));
         }
+    } else {
+        std::cerr << "message\n";
     }
     return result;
 }
 
-
-const Column operator*(const double& left, const Column& right) {
-  size_t size = right.size();
-  Column tmp(size);
-  tmp = right;
-  for (size_t i = 0; i < size; i++)
-    tmp[i] = tmp[i] * left;
-  return tmp;
+bool UpperRelaxationMethodSolver::needApproximation()
+{
+    return true;
 }

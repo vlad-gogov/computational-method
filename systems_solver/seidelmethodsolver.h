@@ -6,7 +6,14 @@
 class SeidelMethodSolver : public LESystemSolver
 {
 public:
-    Column solve(const Matrix& A, const Column& b, const Column& x = Column()) override;
+    SeidelMethodSolver() = default;
+    ~SeidelMethodSolver() = default;
+
+    Column solve(const Matrix& A,
+                 const Column& b,
+                 const Column& x = Column(),
+                 double epsilon = 0) override;
+    bool needApproximation() override;
 };
 
 #endif // SEIDELMETHODSOLVER_H

@@ -3,22 +3,26 @@
 
 #include <list>
 #include <array>
+#include <chrono>
 
 #include <QMainWindow>
 #include <QInputDialog>
 #include <QWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QResizeEvent>
 
+#include "method.h"
 #include "systemtablemodel.h"
 #include "solutiontablemodel.h"
 #include "lesystemsolver.h"
 #include "gaussmethodsolver.h"
 #include "kramermethodsolver.h"
+#include "seidelmethodsolver.h"
 #include "simpleiterationmethodsolver.h"
 #include "upperrelaxationmethodsolver.h"
-#include "seidelmethodsolver.h"
 #include "jacobimethodsolver.h"
+#include "datarequestdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,16 +31,6 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
-    enum Method
-    {
-        GaussMethod,
-        KramerMethod,
-        SeidelMethod,
-        SimpleIterationMethod,
-        UpperRelaxationMethod,
-        JacobiMethod
-    };
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -49,7 +43,12 @@ public slots:
     void enableWorkspace();
     void disableWorkspace();
     void solveWithChosenMethod();
-    void solveWithAllMethod();
+    void solveWithAllMethods();
+    void toggleSolution();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    static QString methodName(int method);
 
 private:
     Ui::MainWindow *ui;
@@ -57,7 +56,7 @@ private:
     int m_eq_count;
     SystemTableModel *m_system;
     SolutionTableModel *m_solution;
-    std::array<LESystemSolver*, 6> m_solvers;
+    std::array<LESystemSolver*, METHODS_COUNT> m_solvers;
 };
 
 #endif // MAINWINDOW_H

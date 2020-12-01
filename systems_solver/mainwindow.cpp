@@ -1,17 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+constexpr double EPSILON = 1e-4;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    setMinimumSize(812, 512);
     ui->setupUi(this);
     m_workspace.push_back(ui->label_system);
     m_workspace.push_back(ui->table_system);
     m_workspace.push_back(ui->combobox_method);
     m_workspace.push_back(ui->pushbutton_solve);
     m_workspace.push_back(ui->pushbutton_solve_all);
-    m_workspace.push_back(ui->checkbox_time_measurement);
+    m_workspace.push_back(ui->pushbutton_toggle);
 
     m_system = nullptr;
     m_solution = nullptr;
@@ -24,23 +27,25 @@ MainWindow::MainWindow(QWidget *parent) :
     m_solvers[GaussMethod] = new GaussMethodSolver;
     m_solvers[KramerMethod] = new KramerMethodSolver;
     m_solvers[SeidelMethod] = new SeidelMethodSolver;
+    m_solvers[JacobiMethod] = new JacobiMethodSolver;
     m_solvers[SimpleIterationMethod] = new SimpleIterationMethodSolver;
     m_solvers[UpperRelaxationMethod] = new UpperRelaxationMethodSolver;
-    m_solvers[JacobiMethod] = new JacobiMethodSolver;
 
-    ui->progress->hide();
     ui->label_solution->hide();
     ui->table_solution->hide();
     ui->label_fastest_method->hide();
     hideWorkspace();
     connect(ui->action_start, &QAction::triggered, this, &MainWindow::startOver);
     connect(ui->pushbutton_solve, &QPushButton::clicked, this, &MainWindow::solveWithChosenMethod);
-    connect(ui->pushbutton_solve_all, &QPushButton::clicked, this, &MainWindow::solveWithAllMethod);
+    connect(ui->pushbutton_solve_all, &QPushButton::clicked, this, &MainWindow::solveWithAllMethods);
+    connect(ui->pushbutton_toggle, &QPushButton::clicked, this, &MainWindow::toggleSolution);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    for (auto& solver : m_solvers)
+        delete solver;
 }
 
 void MainWindow::startOver()
@@ -49,19 +54,21 @@ void MainWindow::startOver()
     int eq_count = QInputDialog::getInt(this,
                                         "Number of unknown variables",
                                         "Enter a number of unknown variables "
-                                        "(from 1 to 16, this also will be a number of equations)",
-                                        1, 1, 16, 1, &ok);
+                                        "(from 2 to 16)",
+                                        2, 2, 16, 1, &ok);
     if (!ok)
         return;
     m_eq_count = eq_count;
-    ui->progress->hide();
     ui->label_solution->hide();
     ui->table_solution->hide();
+    ui->label_fastest_method->hide();
     showWorkspace();
+    enableWorkspace();
     if (m_system != nullptr)
         delete m_system;
     m_system = new SystemTableModel(m_eq_count, ui->table_system);
     ui->table_system->setModel(m_system);
+    ui->pushbutton_toggle->setDisabled(true);
 }
 
 void MainWindow::showWorkspace()
@@ -90,50 +97,122 @@ void MainWindow::disableWorkspace()
 
 void MainWindow::solveWithChosenMethod()
 {
-    disableWorkspace();
-    ui->progress->show();
-    int method = ui->combobox_method->currentIndex();
     const Matrix &A = m_system->matrix();
+    if (LESystemSolver::determinant(A) == 0)
+    {
+        QMessageBox::warning(this, "Error", "Matrix determinant equals to zero.");
+        return;
+    }
+
+    using Clock = std::chrono::high_resolution_clock;
+    int method = ui->combobox_method->currentIndex();
+    DataRequestDialog dialog(m_eq_count);
+    if (m_solvers[method]->needApproximation())
+    {
+        dialog.exec();
+        if (dialog.result() != QDialog::Accepted)
+            return;
+    }
+    disableWorkspace();
     const Column &b = m_system->column();
-    Column x = {1, 1};
-    Column result = m_solvers[method]->solve(A, b, x);
-
-    std::vector<Column> solutions = { result };
-    std::vector<double> durations = { 0.1 };
+    const Column &x = dialog.resultColumn();
+    Clock::time_point t1 = Clock::now();
+    Column result = m_solvers[method]->solve(A, b, x, EPSILON);
+    Clock::time_point t2 = Clock::now();
+    std::chrono::duration<double> duration = t2 - t1;
     if (m_solution != nullptr)
-        delete m_system;
-    m_solution = new SolutionTableModel(solutions, durations, ui->table_system);
+        delete m_solution;
+    m_solution = new SolutionTableModel({{ method, result, duration.count() }});
     ui->table_solution->setModel(m_solution);
-
     ui->label_solution->show();
     ui->table_solution->show();
-    ui->label_fastest_method->show();
-    //enableWorkspace();
-    //ui->progress->hide();
+    ui->label_fastest_method->hide();
+    enableWorkspace();
 }
 
-void MainWindow::solveWithAllMethod()
+void MainWindow::solveWithAllMethods()
 {
-    // TODO
-    disableWorkspace();
-    ui->progress->show();
     const Matrix &A = m_system->matrix();
+    if (LESystemSolver::determinant(A) == 0)
+    {
+        QMessageBox::warning(this, "Error", "Matrix determinant equals to zero.");
+        return;
+    }
+
+    using Clock = std::chrono::high_resolution_clock;
+    DataRequestDialog dialog(m_eq_count);
+    dialog.exec();
+    if (dialog.result() != QDialog::Accepted)
+        return;
+    disableWorkspace();
     const Column &b = m_system->column();
-    Column x = {1, 1};
-    for(size_t method = 0; method < 4; method++) {
-    Column result = m_solvers[method]->solve(A, b, x);
-
-    std::vector<Column> solutions = { result };
-    std::vector<double> durations = { 0.1 };
+    const Column &x = dialog.resultColumn();
+    std::vector<Solution> solutions;
+    double fastest = std::numeric_limits<double>::max();
+    int fastest_method = GaussMethod;
+    for (int method = 0; method < METHODS_COUNT; method++)
+    {
+        Clock::time_point t1 = Clock::now();
+        Column result = m_solvers[method]->solve(A, b, x, EPSILON);
+        Clock::time_point t2 = Clock::now();
+        std::chrono::duration<double> duration = t2 - t1;
+        double duration_s = duration.count();
+        if (duration_s < fastest)
+        {
+            fastest = duration_s;
+            fastest_method = method;
+        }
+        solutions.push_back({ method, result, duration_s });
+    }
     if (m_solution != nullptr)
-        delete m_system;
-    m_solution = new SolutionTableModel(solutions, durations, ui->table_system);
+        delete m_solution;
+    ui->label_fastest_method->setText("The fastest method is " + methodName(fastest_method));
+    m_solution = new SolutionTableModel(solutions);
     ui->table_solution->setModel(m_solution);
-
     ui->label_solution->show();
     ui->table_solution->show();
     ui->label_fastest_method->show();
-    //enableWorkspace();
-    //ui->progress->hide();
+    enableWorkspace();
+}
+
+void MainWindow::toggleSolution()
+{
+    bool hidden = ui->table_solution->isHidden();
+    if (hidden)
+    {
+        ui->label_solution->show();
+        ui->table_solution->show();
+        ui->label_fastest_method->show();
+        ui->pushbutton_toggle->setText("Hide last solution");
     }
+    else
+    {
+        ui->label_solution->hide();
+        ui->table_solution->hide();
+        ui->label_fastest_method->hide();
+        ui->pushbutton_toggle->setText("Show last solution");
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    ui->verticalLayoutWidget->setFixedWidth(event->size().width() - 20);
+    ui->verticalLayoutWidget->setFixedHeight(event->size().height() - 60);
+}
+
+QString MainWindow::methodName(int method)
+{
+    if (method == GaussMethod)
+        return "Gauss";
+    if (method == KramerMethod)
+        return "Kramer";
+    if (method == SeidelMethod)
+        return "Seidel";
+    if (method == SimpleIterationMethod)
+        return "Simple";
+    if (method == UpperRelaxationMethod)
+        return "Upper";
+    if (method == JacobiMethod)
+        return "Jacobi";
+    return "Unknown method";
 }

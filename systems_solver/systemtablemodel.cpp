@@ -71,8 +71,8 @@ QVariant SystemTableModel::headerData(int column, Qt::Orientation orientation, i
     if (role != Qt::DisplayRole)
         return QVariant();
     if (orientation == Qt::Vertical)
-        return column + 1;
+        return "Eq. " + QString::fromStdString(std::to_string(column + 1));
     if (column >= m_eq_count)
         return "b";
-    return "x" + QString::fromStdString(std::to_string(column + 1));
+    return "X" + QString::fromStdString(std::to_string(column + 1));
 }
