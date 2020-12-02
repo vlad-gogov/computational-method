@@ -58,7 +58,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Jacobi method</string>
+           <string>LU decomposition method</string>
           </property>
          </item>
         </widget>

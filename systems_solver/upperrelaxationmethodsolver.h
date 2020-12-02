@@ -2,6 +2,7 @@
 #define UPPERRELAXATIONMETHODSOLVER_H
 
 #include <random>
+#include <stdexcept>
 
 #include "lesystemsolver.h"
 
@@ -16,7 +17,6 @@ public:
                  const Column& x = Column(),
                  double epsilon = 0) override;
     bool needApproximation() override;
-    bool convergeMatrix(const Matrix& A);
 };
 
 #endif // UPPERRELAXATIONMETHODSOLVER_H

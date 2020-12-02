@@ -11,9 +11,9 @@ CONFIG += c++11
 SOURCES += \
     firstapproximationtablemodel.cpp \
     gaussmethodsolver.cpp \
-    jacobimethodsolver.cpp \
     kramermethodsolver.cpp \
     lesystemsolver.cpp \
+    ludecompositionmethodsolver.cpp \
     mainwindow.cpp \
     main.cpp \
     matrix.cpp \
@@ -27,9 +27,9 @@ SOURCES += \
 HEADERS += \
     firstapproximationtablemodel.h \
     gaussmethodsolver.h \
-    jacobimethodsolver.h \
     kramermethodsolver.h \
     lesystemsolver.h \
+    ludecompositionmethodsolver.h \
     mainwindow.h \
     matrix.h \
     method.h \

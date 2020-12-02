@@ -1,7 +1,7 @@
 #include "firstapproximationtablemodel.h"
 
-FirstApproximationTableModel::FirstApproximationTableModel(int eq_count, QObject *parent)
-    : QAbstractTableModel(parent), m_eq_count(eq_count), m_column(eq_count, 0.0)
+FirstApproximationTableModel::FirstApproximationTableModel(int eq_count, const Column& b, QObject *parent)
+    : QAbstractTableModel(parent), m_eq_count(eq_count), m_column(b)
 {
 }
 

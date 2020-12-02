@@ -27,9 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_solvers[GaussMethod] = new GaussMethodSolver;
     m_solvers[KramerMethod] = new KramerMethodSolver;
     m_solvers[SeidelMethod] = new SeidelMethodSolver;
-    m_solvers[JacobiMethod] = new JacobiMethodSolver;
     m_solvers[SimpleIterationMethod] = new SimpleIterationMethodSolver;
     m_solvers[UpperRelaxationMethod] = new UpperRelaxationMethodSolver;
+    m_solvers[LUDecompositionMethod] = new LUDecompositionMethodSolver;
 
     ui->label_solution->hide();
     ui->table_solution->hide();
@@ -106,7 +106,7 @@ void MainWindow::solveWithChosenMethod()
 
     using Clock = std::chrono::high_resolution_clock;
     int method = ui->combobox_method->currentIndex();
-    DataRequestDialog dialog(m_eq_count);
+    DataRequestDialog dialog(m_eq_count, m_system->column());
     if (m_solvers[method]->needApproximation())
     {
         dialog.exec();
@@ -140,7 +140,7 @@ void MainWindow::solveWithAllMethods()
     }
 
     using Clock = std::chrono::high_resolution_clock;
-    DataRequestDialog dialog(m_eq_count);
+    DataRequestDialog dialog(m_eq_count, m_system->column());
     dialog.exec();
     if (dialog.result() != QDialog::Accepted)
         return;
@@ -150,6 +150,8 @@ void MainWindow::solveWithAllMethods()
     std::vector<Solution> solutions;
     double fastest = std::numeric_limits<double>::max();
     int fastest_method = GaussMethod;
+    bool was_errors = false;
+    QString errors;
     for (int method = 0; method < METHODS_COUNT; method++)
     {
         try {
@@ -165,9 +167,8 @@ void MainWindow::solveWithAllMethods()
             }
             solutions.push_back({ method, result, duration_s });
         } catch (std::runtime_error& error) {
-            QMessageBox::information(this,
-                                     "Warning",
-                                     methodName(method) + " cannot be executed. " + error.what());
+            was_errors = true;
+            errors += methodName(method) + " cannot be executed. " + error.what() + "\n";
           }
     }
     if (m_solution != nullptr)
@@ -178,6 +179,8 @@ void MainWindow::solveWithAllMethods()
     ui->label_solution->show();
     ui->table_solution->show();
     ui->label_fastest_method->show();
+    if (was_errors)
+            QMessageBox::information(this, "Warning", errors);
     enableWorkspace();
 }
 
@@ -218,7 +221,7 @@ QString MainWindow::methodName(int method)
         return "Simple";
     if (method == UpperRelaxationMethod)
         return "Upper Relaxation";
-    if (method == JacobiMethod)
-        return "Jacobi";
+    if (method == LUDecompositionMethod)
+        return "LU Decomposition";
     return "Unknown method";
 }

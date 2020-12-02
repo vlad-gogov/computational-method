@@ -14,7 +14,7 @@ class FirstApproximationTableModel : public QAbstractTableModel
     Column m_column;
 
 public:
-    explicit FirstApproximationTableModel(int eq_count = 1, QObject *parent = nullptr);
+    explicit FirstApproximationTableModel(int eq_count = 1, const Column& b = Column(1, 0),  QObject *parent = nullptr);
     ~FirstApproximationTableModel() = default;
 
     const Column &column() const;
