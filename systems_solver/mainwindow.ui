@@ -110,7 +110,7 @@
          <item>
           <widget class="QLabel" name="label_solution">
            <property name="text">
-            <string>Solution of system (epsilon = 0.001)</string>
+            <string>Solution of system (epsilon = 0.0001)</string>
            </property>
           </widget>
          </item>
