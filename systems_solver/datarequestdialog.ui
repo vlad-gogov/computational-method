@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>First approximation</string>
+   <string>Первое приближение</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Enter the first approximation</string>
+    <string>Введите «Первое приближение»</string>
    </property>
   </widget>
  </widget>

@@ -6,7 +6,7 @@ Column KramerMethodSolver::solve(const Matrix& A, const Column& b, const Column&
     Column dets, result;
     double det = determinant(A);
     if (det == 0)
-        throw std::runtime_error("Matrix determinant equals to zero.");
+        throw std::runtime_error("Определитель матрицы равен 0.");
     for (size_t i = 0; i < size; i++)
     {
         Matrix A_ = A;

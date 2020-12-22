@@ -34,19 +34,19 @@ QVariant SolutionTableModel::headerData(int column, Qt::Orientation orientation,
     if (role != Qt::DisplayRole)
         return QVariant();
     if (orientation == Qt::Vertical)
-        return column >= m_eq_count ? QString("Duration") : "X" + QString::fromStdString(std::to_string(column + 1));
+        return column >= m_eq_count ? QString("Решение") : "X" + QString::fromStdString(std::to_string(column + 1));
     int method = m_solutions[column].method;
     if (method == GaussMethod)
-        return "Gauss";
+        return "Гаусс";
     if (method == KramerMethod)
-        return "Kramer";
+        return "Крамер";
     if (method == SeidelMethod)
-        return "Seidel";
+        return "Зейдель";
     if (method == SimpleIterationMethod)
-        return "Simple iteration";
+        return "Простые итерации";
     if (method == UpperRelaxationMethod)
-        return "Upper relaxation";
+        return "Верхняя релаксация";
     if (method == LUDecompositionMethod)
-        return "LU Decomposition";
-    return "Unknown method";
+        return "LU-разложение";
+    return "Метод не определен";
 }

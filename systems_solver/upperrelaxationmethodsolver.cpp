@@ -3,9 +3,9 @@
 Column UpperRelaxationMethodSolver::solve(const Matrix& A, const Column& b, const Column& x, double epsilon)
 {
     if(hasZerosDiagonal(A))
-        throw std::runtime_error("Matrix has at least 1 zero on diagonal.");
+        throw std::runtime_error("Матрица имеет по крайней мере 1 ноль по диагонали.");
     if (!diagonalPredominant(A))
-        throw std::runtime_error("Matrix is not diagonal-predominant.");
+        throw std::runtime_error("Матрица не обладает свойством диагонального преобладания.");
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dist(1.0001, 1.9999);

@@ -3,9 +3,9 @@
 Column SeidelMethodSolver::solve(const Matrix& A, const Column& b, const Column& x, double epsilon)
 {
     if(hasZerosDiagonal(A))
-        throw std::runtime_error("Matrix has at least 1 zero on diagonal.");
+        throw std::runtime_error("Матрица имеет по крайней мере 1 ноль по диагонали.");
     if (!diagonalPredominant(A))
-        throw std::runtime_error("Matrix is not diagonal-predominant.");
+        throw std::runtime_error("Матрица не обладает свойством диагонального преобладания.");
     Column x_curr = x;
     Column x_prev;
     size_t size = A.size();

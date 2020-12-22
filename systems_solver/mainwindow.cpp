@@ -52,9 +52,9 @@ void MainWindow::startOver()
 {
     bool ok = false;
     int eq_count = QInputDialog::getInt(this,
-                                        "Number of unknown variables",
-                                        "Enter a number of unknown variables "
-                                        "(from 2 to 16)",
+                                        "Количество неизвестных переменных",
+                                        "Введите количество неизвестных переменных "
+                                        "(от 2 до 16)",
                                         2, 2, 16, 1, &ok);
     if (!ok)
         return;
@@ -100,7 +100,7 @@ void MainWindow::solveWithChosenMethod()
     const Matrix &A = m_system->matrix();
     if (LESystemSolver::determinant(A) == 0)
     {
-        QMessageBox::warning(this, "Error", "Matrix determinant equals to zero.");
+        QMessageBox::warning(this, "Error", "Определитель матрицы равен 0.");
         return;
     }
 
@@ -130,8 +130,8 @@ void MainWindow::solveWithChosenMethod()
         ui->label_fastest_method->hide();
     }  catch (std::runtime_error& error) {
         QMessageBox::information(this,
-                                 "Warning",
-                                 methodName(method) + " cannot be executed. " + error.what());
+                                 "Предупреждение",
+                                 methodName(method) + " не может быть выполнен. " + error.what());
     }
     enableWorkspace();
 }
@@ -141,7 +141,7 @@ void MainWindow::solveWithAllMethods()
     const Matrix &A = m_system->matrix();
     if (LESystemSolver::determinant(A) == 0)
     {
-        QMessageBox::warning(this, "Error", "Matrix determinant equals to zero.");
+        QMessageBox::warning(this, "Ошибка", "Определитель матрицы равен 0.");
         return;
     }
 
@@ -174,19 +174,19 @@ void MainWindow::solveWithAllMethods()
             solutions.push_back({ method, result, duration_s });
         } catch (std::runtime_error& error) {
             was_errors = true;
-            errors += methodName(method) + " cannot be executed. " + error.what() + "\n";
+            errors += methodName(method) + " не может быть выполнен. " + error.what() + "\n";
           }
     }
     if (m_solution != nullptr)
         delete m_solution;
-    ui->label_fastest_method->setText("The fastest method is " + methodName(fastest_method));
+    ui->label_fastest_method->setText("Самый быстрый " + methodName(fastest_method));
     m_solution = new SolutionTableModel(solutions);
     ui->table_solution->setModel(m_solution);
     ui->label_solution->show();
     ui->table_solution->show();
     ui->label_fastest_method->show();
     if (was_errors)
-            QMessageBox::information(this, "Warning", errors);
+            QMessageBox::information(this, "Предупреждение", errors);
     enableWorkspace();
 }
 
@@ -198,14 +198,14 @@ void MainWindow::toggleSolution()
         ui->label_solution->show();
         ui->table_solution->show();
         ui->label_fastest_method->show();
-        ui->pushbutton_toggle->setText("Hide last solution");
+        ui->pushbutton_toggle->setText("Скрыть последнее решение");
     }
     else
     {
         ui->label_solution->hide();
         ui->table_solution->hide();
         ui->label_fastest_method->hide();
-        ui->pushbutton_toggle->setText("Show last solution");
+        ui->pushbutton_toggle->setText("Показать последнее решение");
     }
 }
 
@@ -218,16 +218,16 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 QString MainWindow::methodName(int method)
 {
     if (method == GaussMethod)
-        return "Gauss";
+        return "метод Гаусса";
     if (method == KramerMethod)
-        return "Kramer";
+        return "метод Крамера";
     if (method == SeidelMethod)
-        return "Seidel";
+        return "метод Зейделя";
     if (method == SimpleIterationMethod)
-        return "Simple";
+        return "метод Простых итераций";
     if (method == UpperRelaxationMethod)
-        return "Upper Relaxation";
+        return "метод Верхней релаксации";
     if (method == LUDecompositionMethod)
-        return "LU Decomposition";
-    return "Unknown method";
+        return "метод LU-разложения";
+    return "метод не определен";
 }

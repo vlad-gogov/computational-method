@@ -42,7 +42,7 @@ bool FirstApproximationTableModel::setData(const QModelIndex &index, const QVari
         emit dataChanged(index, index);
         return true;
     }
-    QMessageBox::warning(nullptr, "Error", "\"" + value.toString() + "\" is not a correct number.");
+    QMessageBox::warning(nullptr, "Ошибка", "\"" + value.toString() + "\" некорректное значение.");
     return false;
 }
 

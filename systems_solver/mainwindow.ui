@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Linear equations system solver</string>
+   <string>Решение систем линейных уравнений</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -33,32 +33,32 @@
         <widget class="QComboBox" name="combobox_method">
          <item>
           <property name="text">
-           <string>Gauss method</string>
+           <string>Метод Гаусса </string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Kramer method</string>
+           <string>Метод Крамера</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Seidel method</string>
+           <string>Метод Зейделя</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Upper relaxation method</string>
+           <string>Метод верхней релаксации</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Simple iteration method</string>
+           <string>Метод простых итераций</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>LU decomposition method</string>
+           <string>LU-разложение</string>
           </property>
          </item>
         </widget>
@@ -66,21 +66,21 @@
        <item>
         <widget class="QPushButton" name="pushbutton_solve">
          <property name="text">
-          <string>Solve with chosen method</string>
+          <string>Решить выбранным методом</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushbutton_solve_all">
          <property name="text">
-          <string>Solve with all methods</string>
+          <string>Решить всеми методами</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushbutton_toggle">
          <property name="text">
-          <string>Hide last solution</string>
+          <string>Скрыть последнее решение</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -96,7 +96,7 @@
          <item>
           <widget class="QLabel" name="label_system">
            <property name="text">
-            <string>Ax=b: enter values from matrix A and vector b below</string>
+            <string>Ax=b: введите значения матрицы A и вектора b ниже</string>
            </property>
           </widget>
          </item>
@@ -110,7 +110,7 @@
          <item>
           <widget class="QLabel" name="label_solution">
            <property name="text">
-            <string>Solution of system (epsilon = 0.0001)</string>
+            <string>Решение системы (epsilon = 0.0001)</string>
            </property>
           </widget>
          </item>
@@ -133,7 +133,7 @@
         </font>
        </property>
        <property name="text">
-        <string>The fastest method is undefined.</string>
+        <string>Самый быстрый метод не определен</string>
        </property>
       </widget>
      </item>
@@ -171,7 +171,7 @@
   </widget>
   <action name="action_start">
    <property name="text">
-    <string>Start</string>
+    <string>Начать</string>
    </property>
    <property name="toolTip">
     <string>Start</string>
